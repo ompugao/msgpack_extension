@@ -54,9 +54,7 @@ else()
 endif()
 
 # msgpack
-set(MSGPACK_INCLUDE_DIRS "$ENV{HOME}/install/include")
-set(MSGPACK_LIBRARY_DIRS "$ENV{HOME}/install/lib/")
-set(MSGPACK_LIBRARIES msgpack msgpackc)
+find_package(MsgPack)
 
 # zmq
 find_package(libzmq)
@@ -71,17 +69,16 @@ endif()
 	#install(DIRECTORY "${MSVC_BINARIES_DIR}/${CMAKE_SYSTEM_PROCESSOR}/${MSVC_PREFIX}/bin/" DESTINATION bin)
 #endif()
 
-find_package(Boost)
 find_package(PCL)
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-include_directories(${MSGPACK_INCLUDE_DIRS} ${libzmq_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
-link_directories(${MSGPACK_LIBRARY_DIRS} ${libzmq_LIBRARY_DIRS})
+include_directories(${MSGPACK_INCLUDE_DIR} ${libzmq_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
+link_directories(${MSGPACK_LIB_DIR} ${libzmq_LIBRARY_DIRS})
 add_executable(msgpacktest main.cpp)
-set_target_properties(msgpacktest PROPERTIES COMPILE_FLAGS "-std=c++0x ${Boost_CFLAGS}" LINK_FLAGS "")
-target_link_libraries(msgpacktest ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_DATE_TIME_LIBRARY} ${MSGPACK_LIBRARIES} ${libzmq_LIBRARIES} ${PCL_LIBRARIES})
+set_target_properties(msgpacktest PROPERTIES COMPILE_FLAGS "-std=c++0x" LINK_FLAGS "")
+target_link_libraries(msgpacktest ${MSGPACK_LIBRARIES} ${libzmq_LIBRARIES} ${PCL_LIBRARIES})
 
 install(TARGETS msgpacktest DESTINATION bin)
 
