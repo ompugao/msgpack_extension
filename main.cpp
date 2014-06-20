@@ -14,6 +14,32 @@ public:
     MSGPACK_DEFINE(m_str, m_vec, m_eigenvec, m_cloud);
 };
 
+// ファイル読み込み
+int ReadAllBytes(const std::string& path,std::vector<char>& buf) {
+    std::ifstream fin(path.c_str(), std::ios::in | std::ios::binary );
+    if(!fin) {
+        return 1;
+    }
+    char c;
+    for(;;){
+        fin.read(&c,sizeof(char));
+        if(!fin.eof()) buf.push_back(c);
+        else break;
+    }
+    fin.close();
+    return 0;
+}
+// ファイル書き込み
+int WriteAllBytes(const std::string& path,const char* buf, int size){
+    std::ofstream ofs(path.c_str(), std::ios::out | std::ios::binary | std::ios::trunc );
+    if(!ofs){
+        return 1;
+    }
+    ofs.write(buf,size);
+    ofs.close();
+    return 0;
+}
+
 int main(void) {
     std::vector<myclass> vec;
     // add some elements into vec...
@@ -42,6 +68,7 @@ int main(void) {
     msgpack::unpacked msg;
     msgpack::unpack(&msg, sbuf.data(), sbuf.size());
 
+    WriteAllBytes("data.bin", sbuf.data(), sbuf.size());
     msgpack::object obj = msg.get();
 
     // you can convert object to myclass directly

@@ -56,17 +56,9 @@ inline Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols > & op
 	if(o.type != type::ARRAY) { throw type_error(); }
 	if(o.via.array.size > 0) {
         msgpack::object * p = o.via.array.ptr;
-
-        std::string type;
-        *p >> type;
-        if (type != "__eigen__") {return v;}
-
         size_t rows;
         size_t cols;
-
-        ++p;
-        *p >> rows;
-        ++p;
+        *p >> rows; ++p;
         *p >> cols;
         v.resize(rows, cols);
 
@@ -83,8 +75,7 @@ inline Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols > & op
 template <typename Stream,typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
 inline packer<Stream>& operator<< (packer<Stream>& o, const Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols >& v)
 {
-    o.pack_array(3 + v.rows()*v.cols());
-    o.pack(std::string("__eigen__"));
+    o.pack_array(2 + v.rows()*v.cols());
     o.pack(v.rows());
     o.pack(v.cols());
 
@@ -100,7 +91,7 @@ template<typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int
 inline void operator<< (object::with_zone& o, const Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols >& v)
 {
 	o.type = type::ARRAY;
-    size_t msgsize = 3 + v.rows()*v.cols();
+    size_t msgsize = 2 + v.rows()*v.cols();
     object* p = (object*)o.zone->malloc(sizeof(object)*msgsize);
     o.via.array.ptr = p;
     o.via.array.size = msgsize;
@@ -120,9 +111,6 @@ inline Eigen::Quaternion< Scalar, Options > & operator>> (object o, Eigen::Quate
 	if(o.via.array.size > 0) {
         msgpack::object * p = o.via.array.ptr;
 
-        std::string type;
-        *p >> type;++p;
-        if (type != "__eigen__") {return v;}
         *p >> v.w();++p;
         *p >> v.x();++p;
         *p >> v.y();++p;
@@ -134,8 +122,7 @@ inline Eigen::Quaternion< Scalar, Options > & operator>> (object o, Eigen::Quate
 template<typename Stream, typename Scalar, int Options>
 inline packer<Stream>& operator<< (packer<Stream>& o, const Eigen::Quaternion< Scalar, Options >& v)
 {
-    o.pack_array(5);
-    o.pack(std::string("__eigen__"));
+    o.pack_array(4);
     o.pack(v.w());
     o.pack(v.x());
     o.pack(v.y());
@@ -147,11 +134,10 @@ template<typename Scalar, int Options>
 inline void operator<< (object::with_zone& o, const Eigen::Quaternion< Scalar, Options >& v)
 {
 	o.type = type::ARRAY;
-    size_t msgsize = 5;
+    size_t msgsize = 4;
     object* p = (object*)o.zone->malloc(sizeof(object)*msgsize);
     o.via.array.ptr = p;
     o.via.array.size = msgsize;
-    *p = object(std::string("__eigen__"), o.zone); ++p;
     *p = object(v.w(), o.zone); ++p;
     *p = object(v.x(), o.zone); ++p;
     *p = object(v.y(), o.zone); ++p;
