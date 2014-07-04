@@ -62,8 +62,8 @@ inline Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols > & op
         *p >> cols;
         v.resize(rows, cols);
 
-        for (size_t i = 0; i < v.rows(); ++i) {
-            for (size_t j = 0; j < v.cols(); ++j) {
+        for (int i = 0; i < v.rows(); ++i) {
+            for (int j = 0; j < v.cols(); ++j) {
                 ++p;
                 *p >> v.operator()(i, j);
             }
