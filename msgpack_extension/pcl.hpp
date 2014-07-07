@@ -83,7 +83,7 @@ inline pcl::Normal& operator>> (object o, pcl::Normal& v)
 template <typename Stream>
 inline packer<Stream>& operator<< (packer<Stream>& o, const pcl::Normal& v)
 {
-	o.pack_array(4);
+	o.pack_array(8);
     o.pack(v.normal_x);
     o.pack(v.normal_y);
     o.pack(v.normal_z);
@@ -117,6 +117,70 @@ inline void operator<< (object::with_zone& o, const pcl::Normal& v)
     } while(p < pend2);
 }
 /************** end of Normal *****************/
+
+/************** PointNormal *****************/
+inline pcl::PointNormal& operator>> (object o, pcl::PointNormal& v)
+{
+	if(o.type != type::ARRAY) { throw type_error(); }
+	if(o.via.array.size > 0) {
+        if(o.via.array.size!=8) { throw type_error(); }
+		object* p = o.via.array.ptr;
+		object* const pend = o.via.array.ptr + 4;
+		float* it = &v.data_n[0];
+		do {
+			p->convert(it);
+			++p;
+			++it;
+		} while(p < pend);
+
+		it = &v.data_c[0];
+        object* const pend2 = pend + 4;
+		do {
+			p->convert(it);
+			++p;
+			++it;
+		} while(p < pend2);
+	}
+	return v;
+}
+
+template <typename Stream>
+inline packer<Stream>& operator<< (packer<Stream>& o, const pcl::PointNormal& v)
+{
+	o.pack_array(8);
+    o.pack(v.normal_x);
+    o.pack(v.normal_y);
+    o.pack(v.normal_z);
+    o.pack(0);
+    o.pack(v.data_c[0]);
+    o.pack(v.data_c[1]);
+    o.pack(v.data_c[2]);
+    o.pack(v.data_c[3]);
+	return o;
+}
+
+inline void operator<< (object::with_zone& o, const pcl::PointNormal& v)
+{
+	o.type = type::ARRAY;
+    object* p = (object*)o.zone->malloc(sizeof(object)*4);
+    object* const pend = p + 4;
+    object* const pend2 = p + 8;
+    o.via.array.ptr = p;
+    o.via.array.size = 8;
+    size_t i=0;
+    do {
+        *p = object(v.data_n[i], o.zone);
+        ++p;
+        ++i;
+    } while(p < pend);
+    i=0;
+    do {
+        *p = object(v.data_c[i], o.zone);
+        ++p;
+        ++i;
+    } while(p < pend2);
+}
+/************** end of PointNormal *****************/
 
 /************** PointCloud<T> *****************/
 

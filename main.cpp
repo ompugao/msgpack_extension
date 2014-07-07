@@ -1,3 +1,4 @@
+// -*- coding: utf-8 -*-
 #include <msgpack.hpp>
 #include <vector>
 #include <string>
@@ -10,7 +11,7 @@ public:
     std::string m_str;
     std::vector<int> m_vec;
     Eigen::Vector3f m_eigenvec;
-    pcl::PointCloud<pcl::PointXYZ> m_cloud;
+    pcl::PointCloud<pcl::PointNormal> m_cloud;
     MSGPACK_DEFINE(m_str, m_vec, m_eigenvec, m_cloud);
 };
 
@@ -58,6 +59,9 @@ int main(void) {
         h.m_cloud.points[i].x = i*0.1;
         h.m_cloud.points[i].y = i*0.2;
         h.m_cloud.points[i].z = i*0.3;
+        h.m_cloud.points[i].normal_x = (i+1)*0.1;
+        h.m_cloud.points[i].normal_y = (i+1)*0.2;
+        h.m_cloud.points[i].normal_z = (i+1)*0.3;
     }
     vec.push_back(h);
 
@@ -87,6 +91,7 @@ int main(void) {
         std::cout << "height: " << var.m_cloud.height << std::endl;
         for (size_t i = 0; i < var.m_cloud.points.size(); i++) {
             std::cout << var.m_cloud.points[i].x << " " << var.m_cloud.points[i].y << " " << var.m_cloud.points[i].z <<std::endl;
+            std::cout << var.m_cloud.points[i].normal_x << " " << var.m_cloud.points[i].normal_y << " " << var.m_cloud.points[i].normal_z <<std::endl;
         }
     }
 }
