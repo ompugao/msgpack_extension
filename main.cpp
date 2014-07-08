@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <pcl/point_types.h>
+#include <pcl/io/pcd_io.h>
 #include <msgpack_extension/pcl.hpp>
 
 class myclass {
@@ -15,7 +17,6 @@ public:
     MSGPACK_DEFINE(m_str, m_vec, m_eigenvec, m_cloud);
 };
 
-// ファイル読み込み
 int ReadAllBytes(const std::string& path,std::vector<char>& buf) {
     std::ifstream fin(path.c_str(), std::ios::in | std::ios::binary );
     if(!fin) {
@@ -30,7 +31,7 @@ int ReadAllBytes(const std::string& path,std::vector<char>& buf) {
     fin.close();
     return 0;
 }
-// ファイル書き込み
+
 int WriteAllBytes(const std::string& path,const char* buf, int size){
     std::ofstream ofs(path.c_str(), std::ios::out | std::ios::binary | std::ios::trunc );
     if(!ofs){
@@ -62,7 +63,10 @@ int main(void) {
         h.m_cloud.points[i].normal_x = (i+1)*0.1;
         h.m_cloud.points[i].normal_y = (i+1)*0.2;
         h.m_cloud.points[i].normal_z = (i+1)*0.3;
+        h.m_cloud.points[i].curvature = i*0.01;
     }
+
+    //pcl::io::loadPCDFile ("test.pcd", h.m_cloud);
     vec.push_back(h);
 
     // you can serialize myclass directly
@@ -89,9 +93,11 @@ int main(void) {
         std::cout << "points size: " << var.m_cloud.points.size() << std::endl;
         std::cout << "width: " << var.m_cloud.width << std::endl;
         std::cout << "height: " << var.m_cloud.height << std::endl;
-        for (size_t i = 0; i < var.m_cloud.points.size(); i++) {
+        //for (size_t i = 0; i < var.m_cloud.points.size(); i++) {
+        for (size_t i = 0; i < 10; i++) {
             std::cout << var.m_cloud.points[i].x << " " << var.m_cloud.points[i].y << " " << var.m_cloud.points[i].z <<std::endl;
             std::cout << var.m_cloud.points[i].normal_x << " " << var.m_cloud.points[i].normal_y << " " << var.m_cloud.points[i].normal_z <<std::endl;
+            std::cout << var.m_cloud.points[i].curvature << std::endl;
         }
     }
 }
